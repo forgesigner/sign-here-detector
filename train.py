@@ -1,6 +1,7 @@
 import sys
 
-sys.path.append('...')
+sys.path.append('../sign-here-detector-dataset')
+# print(sys.path)
 import importlib
 
 signheredetectordataset = importlib.import_module("sign-here-detector-dataset")
