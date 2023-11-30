@@ -1,7 +1,6 @@
 import torch.nn as nn
 import torchvision.models as models
 
-# test
 class SignatureCenterNet(nn.Module):
     def __init__(self, target_height=936, target_width=662):
         super(SignatureCenterNet, self).__init__()
