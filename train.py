@@ -1,16 +1,22 @@
+import sys
+
+sys.path.append('..')
+import importlib
+
+signheredetectordataset = importlib.import_module("sign-here-detector-dataset")
+from signheredetectordataset import SignatureDataset
 import argparse
 import os.path
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from dataset import SignatureDataset
+
 from model import SignatureCenterNet
 
 
 def train_center_net(
-    checkpoint_path, learning_rate=0.001, batch_size=32, num_epochs=10
+        checkpoint_path, learning_rate=0.001, batch_size=32, num_epochs=10
 ):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
