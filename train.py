@@ -1,4 +1,5 @@
 import sys
+import time
 
 sys.path.append('...')
 from signheredetectordataset import SignatureDataset
@@ -20,7 +21,6 @@ def train_center_net(
 
     if not os.path.exists(checkpoint_path):
         os.makedirs(checkpoint_path)
-
 
     model = SignatureCenterNet().to(device)
     train_dataset = SignatureDataset(train=True)
@@ -86,12 +86,14 @@ def main():
     args = parser.parse_args()
     if args.model == "center":
         train_center_net(
-            args.checkpoint_path, args.learning_rate, args.batch_size, args.num_epochs
+            os.path.join(args.checkpoint_path, 'train' + str(time.time())), args.learning_rate, args.batch_size,
+            args.num_epochs
         )
     elif args.model == "unet":
         print("Not implemented yet")
     else:
         print(f"Unknown model: {args.model}")
+
 
 if __name__ == "__main__":
     main()
