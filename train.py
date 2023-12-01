@@ -82,7 +82,7 @@ def train_center_net(
             "state_dict": model.state_dict(),
             "optimizer": optimizer.state_dict(),
         }
-        wandb.log({"loss": avg_val_loss, "epoch": epoch})
+        wandb.log({"loss": avg_val_loss})
         torch.save(
             checkpoint, os.path.join(checkpoint_path, f"checkpoint_{epoch + 1}.pth")
         )
