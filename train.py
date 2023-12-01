@@ -1,5 +1,6 @@
 import sys
 import time
+import wandb
 
 sys.path.append('...')
 from signheredetectordataset import SignatureDataset
@@ -32,6 +33,20 @@ def train_center_net(
     criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=learning_rate)
     best_val_loss = float("inf")
+
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project="forger",
+
+        # track hyperparameters and run metadata
+        config={
+            "learning_rate": learning_rate,
+            "model": "center",
+            "dataset": "CUAD",
+            "epochs": num_epochs,
+            "batch_size": batch_size
+        }
+    )
 
     for epoch in range(num_epochs):
         model.train()
@@ -67,6 +82,7 @@ def train_center_net(
             "state_dict": model.state_dict(),
             "optimizer": optimizer.state_dict(),
         }
+        wandb.log({"loss": avg_val_loss, "epoch": epoch})
         torch.save(
             checkpoint, os.path.join(checkpoint_path, f"checkpoint_{epoch + 1}.pth")
         )
