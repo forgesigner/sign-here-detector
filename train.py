@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append('../sign-here-detector-dataset')
+sys.path.append('...')
 # print(sys.path)
 import importlib
 
