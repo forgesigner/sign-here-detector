@@ -88,3 +88,6 @@ def main():
         print("Not implemented yet")
     else:
         print(f"Unknown model: {args.model}")
+
+if __name__ == "__main__":
+    main()
