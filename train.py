@@ -18,6 +18,10 @@ def train_center_net(
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
+    if not os.path.exists(checkpoint_path):
+        os.makedirs(checkpoint_path)
+
+
     model = SignatureCenterNet().to(device)
     train_dataset = SignatureDataset(train=True)
     val_dataset = SignatureDataset(train=False)
