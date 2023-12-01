@@ -86,7 +86,9 @@ def main():
     args = parser.parse_args()
     if args.model == "center":
         train_center_net(
-            os.path.join(args.checkpoint_path, 'train' + str(time.time())), args.learning_rate, args.batch_size,
+            os.path.join(args.checkpoint_path,
+                         f'train_model_{args.model}_lr_{args.learning_rate}_bs_{args.batch_size}_epochs_{args.num_epochs}_{time.strftime("%Y%m%d-%H%M%S")}'
+                         ), args.learning_rate, args.batch_size,
             args.num_epochs
         )
     elif args.model == "unet":
