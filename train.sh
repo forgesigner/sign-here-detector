@@ -1,2 +1,2 @@
-cd /home/nikita_khramov/forger/
+cd /forger/
 python3 sign-here-detector/train.py --num_epochs 50
