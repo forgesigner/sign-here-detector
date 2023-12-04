@@ -20,7 +20,8 @@ jobs:
         ssh-keyscan 34.16.177.159 >> ~/.ssh/known_hosts
 
     - name: Pull code on remote server
-      run: ssh -vvv -i ~/.ssh/id_rsa nikita_khramov@34.16.177.159 "cd /home/nikita_khramov/forger/sign-here-detector && 
+      run: ssh -vvv -i ~/.ssh/id_rsa nikita_khramov@34.16.177.159 "cd /home/nikita_khramov/forger/sign-here-detector &&
+        git stash &&
         git pull && 
         source /home/nikita_khramov/forger/forgervenv/bin/activate &&
         pip3 install -r /home/nikita_khramov/forger/sign-here-detector/requirements.txt "
