@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /root/forger/
-python3 sign-here-detector/train.py --num_epochs 50
+python3 signheredetector/train.py --num_epochs 50
