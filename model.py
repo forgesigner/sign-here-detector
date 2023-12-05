@@ -23,6 +23,7 @@ class AdaptiveAvgPool2dCustom(nn.Module):
             x = torch.cat((x, paddzero), axis=-1)
 
         stride_size = np.floor(np.array(x.shape[-2:]) / self.output_size).astype(np.int32)
+        stride_size = np.clip(stride_size, a_min=1, a_max=None)
         kernel_size = np.array(x.shape[-2:]) - (self.output_size - 1) * stride_size
         avg = nn.AvgPool2d(kernel_size=list(kernel_size), stride=list(stride_size))
         x = avg(x)
