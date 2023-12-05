@@ -11,7 +11,7 @@ class SignatureCenterNet(nn.Module):
             in_channels=64, out_channels=1, kernel_size=1, stride=1, padding=0
         )
 
-        self.adaptive_pool = nn.avg_pool2d((target_height, target_width))
+        self.adaptive_pool = nn.AvgPool2d((target_height, target_width))
 
     def _make_deconv_layer(self, num_layers):
         layers = []
