@@ -11,8 +11,33 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader
+import numpy as np
 
 from model import SignatureCenterNet
+
+
+def min_distance_metric(predicted_heatmap, true_centers, top_n=3):
+    flat_indices = predicted_heatmap.view(-1).topk(top_n).indices
+    top_n_indices = np.array(np.unravel_index(flat_indices.numpy(), predicted_heatmap.shape)).T
+
+    min_distances = []
+    for center in true_centers:
+        distances = np.sqrt(np.sum((top_n_indices - np.array(center)) ** 2, axis=1))
+        min_distances.append(np.min(distances))
+
+    return np.mean(min_distances)
+
+
+def extract_true_centers_from_heatmaps(heatmaps):
+    if isinstance(heatmaps, torch.Tensor):
+        heatmaps = heatmaps.cpu().numpy()
+    true_centers = []
+    for heatmap in heatmaps:
+        for y in range(heatmap.shape[0]):
+            for x in range(heatmap.shape[1]):
+                if heatmap[y, x] == np.max(heatmap):
+                    true_centers.append((x, y))
+    return true_centers
 
 
 def train_center_net(
@@ -66,14 +91,19 @@ def train_center_net(
         model.eval()
         with torch.no_grad():
             total_val_loss = 0
+            total_min_distance = 0
             for images, heatmaps in val_loader:
                 images = images.to(device)
                 heatmaps = heatmaps.to(device)
                 outputs = model(images)
                 loss = criterion(outputs, heatmaps)
                 total_val_loss += loss.item()
+                true_centers = extract_true_centers_from_heatmaps(heatmaps)
+                min_distance = min_distance_metric(outputs, true_centers, top_n=3)
+                total_min_distance += min_distance
 
             avg_val_loss = total_val_loss / len(val_loader)
+            avg_min_distance = total_min_distance / len(val_loader)
             print(
                 f"Validation Loss after Epoch [{epoch + 1}/{num_epochs}]: {avg_val_loss}"
             )
@@ -81,9 +111,10 @@ def train_center_net(
         checkpoint = {
             "epoch": epoch + 1,
             "state_dict": model.state_dict(),
-            "optimizer": optimizer.state_dict(),
+            "optimizer": optimizer.state_dict()
         }
-        wandb.log({"loss": avg_val_loss})
+        wandb.log({"loss": avg_val_loss,
+                   "min_distance": avg_min_distance})
         torch.save(
             checkpoint, os.path.join(checkpoint_path, f"checkpoint_{epoch + 1}.pth")
         )
@@ -92,7 +123,8 @@ def train_center_net(
             best_val_loss = avg_val_loss
             torch.save(checkpoint, os.path.join(checkpoint_path, "best_checkpoint.pth"))
             dummy_input = torch.randn(1, 3, 936, 662, device=device)
-            torch.onnx.export(model, dummy_input,  os.path.join(checkpoint_path, "best_checkpoint.onnx"), operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK)
+            torch.onnx.export(model, dummy_input, os.path.join(checkpoint_path, "best_checkpoint.onnx"),
+                              operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK)
 
 
 def main():
