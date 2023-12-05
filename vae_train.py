@@ -111,8 +111,10 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
 
-    epochs = 20
+    epochs = 50
     log_interval = 10
 
     for epoch in range(1, epochs + 1):
         train(model, train_loader, optimizer, device, epoch)
+
+    torch.save(model.state_dict(), 'model_weights.pth')
