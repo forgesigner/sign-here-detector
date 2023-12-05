@@ -31,15 +31,15 @@ def min_distance_metric(predicted_heatmap, true_centers, top_n=3):
 def extract_true_centers_from_heatmaps(heatmaps):
     if isinstance(heatmaps, torch.Tensor):
         heatmaps = heatmaps.cpu().numpy()
+
     true_centers = []
     for heatmap in heatmaps:
-        print(heatmap[0])
-        for y in range(heatmap[0].shape[0]):
-            for x in range(heatmap[0].shape[1]):
-                if heatmap[0][y, x] == np.max(heatmap[0]):
-                    true_centers.append((x, y))
-    return true_centers
+        max_val = np.max(heatmap[0])
+        max_positions = np.argwhere(heatmap[0] == max_val)
+        for pos in max_positions:
+            true_centers.append((pos[1], pos[0]))
 
+    return true_centers
 
 def train_center_net(
         checkpoint_path, learning_rate=0.001, batch_size=32, num_epochs=10
