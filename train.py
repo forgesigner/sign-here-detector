@@ -16,15 +16,20 @@ import numpy as np
 from model import SignatureCenterNet
 
 
-def min_distance_metric(predicted_heatmap, true_centers, top_n=3):
-    flat_indices = predicted_heatmap.view(-1).topk(top_n).indices
-    top_n_indices = np.array(np.unravel_index(flat_indices.cpu().numpy(), predicted_heatmap.shape)).T
-    print(top_n_indices)
-    print(true_centers)
+def min_distance_metric(predicted_heatmaps, true_centers):
+    if isinstance(predicted_heatmaps, torch.Tensor):
+        predicted_heatmaps = predicted_heatmaps.cpu().numpy()
+
+    zipped_heatmaps = zip(predicted_heatmaps, true_centers)
+
     min_distances = []
-    for center in true_centers:
-        distances = np.sqrt(np.sum((top_n_indices - np.array(center)) ** 2, axis=1))
-        min_distances.append(np.min(distances))
+    for heatmap, centers in zipped_heatmaps:
+        true_n = len(centers)
+        top_n_indices = np.unravel_index(np.argsort(heatmap[0].flatten())[-true_n:], heatmap[0].shape)
+        print(top_n_indices)
+        for center in centers:
+            distances = np.sqrt(np.sum((top_n_indices - np.array(center)) ** 2, axis=1))
+            min_distances.append(np.min(distances))
 
     return np.mean(min_distances)
 
@@ -37,8 +42,9 @@ def extract_true_centers_from_heatmaps(heatmaps):
     for heatmap in heatmaps:
         max_val = np.max(heatmap[0])
         max_positions = np.argwhere(heatmap[0] == max_val)
+        true_centers.append([])
         for pos in max_positions:
-            true_centers.append((pos[1], pos[0]))
+            true_centers[-1].append((pos[1], pos[0]))
 
     return true_centers
 
@@ -101,7 +107,7 @@ def train_center_net(
                 loss = criterion(outputs, heatmaps)
                 total_val_loss += loss.item()
                 true_centers = extract_true_centers_from_heatmaps(heatmaps)
-                min_distance = min_distance_metric(outputs, true_centers, top_n=3)
+                min_distance = min_distance_metric(outputs, true_centers)
                 total_min_distance += min_distance
 
             avg_val_loss = total_val_loss / len(val_loader)
