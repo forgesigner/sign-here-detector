@@ -11,6 +11,7 @@ class AdaptiveAvgPool2dCustom(nn.Module):
 
     def forward(self, x: torch.Tensor):
         stride_size = np.floor(np.array(x.shape[-2:]) / self.output_size).astype(np.int32)
+        stride_size = np.clip(stride_size, 1, None)
         kernel_size = np.array(x.shape[-2:]) - (self.output_size - 1) * stride_size
         avg = nn.AvgPool2d(kernel_size=list(kernel_size), stride=list(stride_size))
         x = avg(x)
