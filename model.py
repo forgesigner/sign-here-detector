@@ -4,30 +4,6 @@ import torch.nn as nn
 import torchvision.models as models
 
 
-# class AdaptiveAvgPool2dCustom(nn.Module):
-#     def __init__(self, output_size):
-#         super(AdaptiveAvgPool2dCustom, self).__init__()
-#         self.output_size = np.array(output_size)
-#
-#     def forward(self, x: torch.Tensor):
-#         input_size = np.array(x.shape[-2:])
-#         if any(self.output_size > input_size):
-#             padding_height = max(self.output_size[0] - input_size[0], 0)
-#             padding_width = max(self.output_size[1] - input_size[1], 0)
-#             pad = nn.ZeroPad2d((0, padding_width, 0, padding_height))
-#             x = pad(x)
-#
-#         input_size = np.array(x.shape[-2:])
-#         stride_size = np.floor(input_size / self.output_size).astype(np.int32)
-#         stride_size = np.clip(stride_size, a_min=1, a_max=None)
-#         kernel_size = input_size - (self.output_size - 1) * stride_size
-#         kernel_size = np.clip(kernel_size, a_min=1, a_max=None)
-#
-#         avg = nn.AvgPool2d(kernel_size=list(kernel_size), stride=list(stride_size))
-#         x = avg(x)
-#         return x
-
-
 def _make_deconv_layer(num_layers):
     layers = []
     in_channels = 512

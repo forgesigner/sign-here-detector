@@ -33,6 +33,7 @@ def extract_true_centers_from_heatmaps(heatmaps):
         heatmaps = heatmaps.cpu().numpy()
     true_centers = []
     for heatmap in heatmaps:
+        print(heatmap)
         for y in range(heatmap.shape[0]):
             for x in range(heatmap.shape[1]):
                 if heatmap[y, x] == np.max(heatmap):
