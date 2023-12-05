@@ -99,7 +99,7 @@ def main():
     parser.add_argument("--batch_size", type=int, default=32)
     parser.add_argument("--num_epochs", type=int, default=10)
     parser.add_argument("--model", type=str, default="center")
-    parser.add_argument("--checkpoint_path", type=str, default="checkpoints")
+    parser.add_argument("--checkpoint_path", type=str, default="/root/forger/checkpoints")
     args = parser.parse_args()
     if args.model == "center":
         train_center_net(
