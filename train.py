@@ -25,7 +25,7 @@ def min_distance_metric(predicted_heatmaps, true_centers):
     min_distances = []
     for heatmap, centers in zipped_heatmaps:
         true_n = len(centers)
-        top_n_indices = np.unravel_index(np.argsort(heatmap[0].flatten())[-true_n:], heatmap[0].shape)
+        top_n_indices = np.argpartition(heatmap[0], -true_n)[-true_n:]
         print(top_n_indices)
         for center in centers:
             distances = np.sqrt(np.sum((top_n_indices - np.array(center)) ** 2, axis=1))
