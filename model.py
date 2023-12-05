@@ -1,5 +1,5 @@
-import numpy as np
 import torch
+import numpy as np
 import torch.nn as nn
 import torchvision.models as models
 
@@ -10,8 +10,19 @@ class AdaptiveAvgPool2dCustom(nn.Module):
         self.output_size = np.array(output_size)
 
     def forward(self, x: torch.Tensor):
+        '''
+        Args:
+            x: shape (batch size, channel, height, width)
+        Returns:
+            x: shape (batch size, channel, 1, output_size)
+        '''
+        shape_x = x.shape
+        if(shape_x[-1] < self.output_size[-1]):
+            paddzero = torch.zeros((shape_x[0], shape_x[1], shape_x[2], self.output_size[-1] - shape_x[-1]))
+            paddzero = paddzero.to('cuda:0')
+            x = torch.cat((x, paddzero), axis=-1)
+
         stride_size = np.floor(np.array(x.shape[-2:]) / self.output_size).astype(np.int32)
-        stride_size = np.clip(stride_size, 1, None)
         kernel_size = np.array(x.shape[-2:]) - (self.output_size - 1) * stride_size
         avg = nn.AvgPool2d(kernel_size=list(kernel_size), stride=list(stride_size))
         x = avg(x)
