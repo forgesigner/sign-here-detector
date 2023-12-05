@@ -24,7 +24,7 @@ class SignatureDataset(Dataset):
 
 
 transform = transforms.Compose([
-    transforms.Resize((50, 50)),
+    transforms.Resize((300, 100)),
     transforms.ToTensor(),
     transforms.Lambda(lambda x: x / 255.0)
 ])
@@ -44,7 +44,7 @@ class VAE(nn.Module):
     def __init__(self):
         super(VAE, self).__init__()
 
-        self.input_dim = 50 * 50
+        self.input_dim = 300 * 100
 
         self.fc1 = nn.Linear(self.input_dim, 400)
         self.fc21 = nn.Linear(400, 20)
@@ -73,8 +73,8 @@ class VAE(nn.Module):
 
 
 def loss_function(recon_x, x, mu, logvar):
-    recon_x_flat = recon_x.view(-1, 2500)
-    x_flat = x.view(-1, 2500)
+    recon_x_flat = recon_x.view(-1, 30000)
+    x_flat = x.view(-1, 30000)
 
     if x_flat.max() > 1 or x_flat.min() < 0:
         raise ValueError("Target data out of range. Should be in [0, 1]")
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     train_loader = DataLoader(dataset, batch_size=32, shuffle=True)
 
-    epochs = 10
+    epochs = 20
     log_interval = 10
 
     for epoch in range(1, epochs + 1):
