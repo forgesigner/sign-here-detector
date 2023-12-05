@@ -10,24 +10,23 @@ class AdaptiveAvgPool2dCustom(nn.Module):
         self.output_size = np.array(output_size)
 
     def forward(self, x: torch.Tensor):
-        '''
-        Args:
-            x: shape (batch size, channel, height, width)
-        Returns:
-            x: shape (batch size, channel, 1, output_size)
-        '''
-        shape_x = x.shape
-        if(shape_x[-1] < self.output_size[-1]):
-            paddzero = torch.zeros((shape_x[0], shape_x[1], shape_x[2], self.output_size[-1] - shape_x[-1]))
-            paddzero = paddzero.to('cuda:0')
-            x = torch.cat((x, paddzero), axis=-1)
+        input_size = np.array(x.shape[-2:])
+        if any(self.output_size > input_size):
+            padding_height = max(self.output_size[0] - input_size[0], 0)
+            padding_width = max(self.output_size[1] - input_size[1], 0)
+            pad = nn.ZeroPad2d((0, padding_width, 0, padding_height))
+            x = pad(x)
 
-        stride_size = np.floor(np.array(x.shape[-2:]) / self.output_size).astype(np.int32)
+        input_size = np.array(x.shape[-2:])
+        stride_size = np.floor(input_size / self.output_size).astype(np.int32)
         stride_size = np.clip(stride_size, a_min=1, a_max=None)
-        kernel_size = np.array(x.shape[-2:]) - (self.output_size - 1) * stride_size
+        kernel_size = input_size - (self.output_size - 1) * stride_size
+        kernel_size = np.clip(kernel_size, a_min=1, a_max=None)
+
         avg = nn.AvgPool2d(kernel_size=list(kernel_size), stride=list(stride_size))
         x = avg(x)
         return x
+
 
 def _make_deconv_layer(num_layers):
     layers = []
