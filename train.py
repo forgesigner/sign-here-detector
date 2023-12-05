@@ -2,7 +2,7 @@ import sys
 import time
 import wandb
 
-sys.path.append('...')
+sys.path.append('/root/forger/signheredetector')
 from signheredetectordataset import SignatureDataset
 import argparse
 import os.path
