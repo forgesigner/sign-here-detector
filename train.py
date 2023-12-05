@@ -18,7 +18,7 @@ from model import SignatureCenterNet
 
 def min_distance_metric(predicted_heatmap, true_centers, top_n=3):
     flat_indices = predicted_heatmap.view(-1).topk(top_n).indices
-    top_n_indices = np.array(np.unravel_index(flat_indices.numpy(), predicted_heatmap.shape)).T
+    top_n_indices = np.array(np.unravel_index(flat_indices.cpu().numpy(), predicted_heatmap.shape)).T
 
     min_distances = []
     for center in true_centers:
