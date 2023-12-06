@@ -24,7 +24,7 @@ class SignatureDataset(Dataset):
 
 
 transform = transforms.Compose([
-    transforms.Resize((300, 100)),
+    transforms.Resize((100, 300)),
     transforms.ToTensor(),
     transforms.Lambda(lambda x: x / 255.0)
 ])
