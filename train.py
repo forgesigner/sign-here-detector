@@ -24,15 +24,18 @@ def min_distance_metric(predicted_heatmaps, true_centers):
 
     min_distances = []
     for heatmap, centers in zipped_heatmaps:
-        k = len(centers)
-        flat_indices = np.argpartition(heatmap[0].flatten(), -k)[-k:]
+        # k = len(centers)
+        flat_indices = np.argpartition(heatmap[0].flatten(), -1)[-1:]
         top_k_indices = flat_indices[np.argsort(-heatmap[0].flatten()[flat_indices])]
         top_k_coords = [np.unravel_index(idx, heatmap[0].shape) for idx in top_k_indices]
         top_k_coords = [(y, x) for x, y in top_k_coords]
-        print(top_k_coords)
+        # print(top_k_coords)
+        heatmap_min_dist = []
         for center in centers:
-            distances = np.sqrt(np.sum((top_k_coords - np.array(center)) ** 2, axis=1))
-            min_distances.append(np.min(distances))
+            distance = np.linalg.norm(np.array(center) - np.array(top_k_coords[0]))
+            heatmap_min_dist.append(distance)
+
+        min_distances.append(np.min(heatmap_min_dist))
 
     return np.mean(min_distances)
 
