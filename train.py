@@ -51,6 +51,7 @@ def extract_true_centers_from_heatmaps(heatmaps):
 
     return true_centers
 
+
 def train_center_net(
         checkpoint_path, learning_rate=0.001, batch_size=32, num_epochs=10
 ):
@@ -135,8 +136,7 @@ def train_center_net(
             torch.save(checkpoint, os.path.join(checkpoint_path, "best_checkpoint.pth"))
             dummy_input = torch.randn(1, 3, 936, 662, device=device)
             torch.onnx.export(model, dummy_input, os.path.join(checkpoint_path, "best_checkpoint.onnx"),
-                              # operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK
-                                opset_version=11)
+                              operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK, opset_version=11)
 
 
 def main():
