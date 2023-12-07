@@ -2,6 +2,7 @@ import torch
 import numpy as np
 import torch.nn as nn
 import torchvision.models as models
+import torch.nn.functional as F
 
 
 def _make_deconv_layer(num_layers):
@@ -38,11 +39,11 @@ class SignatureCenterNet(nn.Module):
             in_channels=64, out_channels=1, kernel_size=1, stride=1, padding=0
         )
 
-        self.adaptive_pool = nn.AdaptiveAvgPool2d((target_height, target_width))
+        # self.adaptive_pool = nn.Av
 
     def forward(self, x):
         x = self.backbone(x)
         x = self.deconv_layers(x)
         heatmap = self.final_layer(x)
-        heatmap = self.adaptive_pool(heatmap)
+        heatmap = F.interpolate(heatmap, size=(936, 662), mode='bilinear', align_corners=False)
         return heatmap
