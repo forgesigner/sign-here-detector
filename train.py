@@ -18,7 +18,10 @@ from model import SignatureCenterNet
 
 def min_distance_metric(predicted_heatmaps, true_centers):
     if isinstance(predicted_heatmaps, torch.Tensor):
-        predicted_heatmaps = predicted_heatmaps.cpu().numpy()
+        if predicted_heatmaps.requires_grad:
+            predicted_heatmaps = predicted_heatmaps.detach().numpy()
+        else:
+            predicted_heatmaps = predicted_heatmaps.cpu().numpy()
 
     zipped_heatmaps = zip(predicted_heatmaps, true_centers)
 
