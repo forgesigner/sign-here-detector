@@ -91,6 +91,8 @@ def train_center_net(
 
     for epoch in range(num_epochs):
         model.train()
+        total_train_loss = 0
+        total_min_train_distance = 0
         for i, (images, heatmaps) in enumerate(train_loader):
             images = images.to(device)
             heatmaps = heatmaps.to(device)
@@ -102,6 +104,15 @@ def train_center_net(
             print(
                 f"Epoch [{epoch + 1}/{num_epochs}], Step [{i + 1}/{len(train_loader)}], Loss: {loss.item()}"
             )
+            total_train_loss += loss.item()
+            true_centers = extract_true_centers_from_heatmaps(heatmaps)
+            min_distance = min_distance_metric(outputs, true_centers)
+            total_min_train_distance += min_distance
+
+        avg_train_loss = total_train_loss / len(train_loader)
+        avg_train_min = total_min_train_distance / len(train_loader)
+        wandb.log({"train loss": avg_train_loss,
+                   "train min distance": avg_train_min})
 
         model.eval()
         with torch.no_grad():
@@ -128,8 +139,8 @@ def train_center_net(
             "state_dict": model.state_dict(),
             "optimizer": optimizer.state_dict()
         }
-        wandb.log({"loss": avg_val_loss,
-                   "min_distance": avg_min_distance})
+        wandb.log({"eval loss": avg_val_loss,
+                   "eval min distance": avg_min_distance})
         torch.save(
             checkpoint, os.path.join(checkpoint_path, f"checkpoint_{epoch + 1}.pth")
         )
