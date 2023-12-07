@@ -135,7 +135,8 @@ def train_center_net(
             torch.save(checkpoint, os.path.join(checkpoint_path, "best_checkpoint.pth"))
             dummy_input = torch.randn(1, 3, 936, 662, device=device)
             torch.onnx.export(model, dummy_input, os.path.join(checkpoint_path, "best_checkpoint.onnx"),
-                              operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK)
+                              # operator_export_type=torch.onnx.OperatorExportTypes.ONNX_ATEN_FALLBACK
+                                opset_version=11)
 
 
 def main():
